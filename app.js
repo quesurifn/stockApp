@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var socketio = require('socket.io');
 var mongoose = require('mongoose');
+var yahooFinance = require('yahoo-finance');
 require('./models/model.js');
 
 
