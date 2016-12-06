@@ -1,10 +1,25 @@
+<!-- Chart -->
 <highchart id="chart1" config="chartConfig" class="col-md-12"></highchart>
-  <div class="col-md-12">
+
+
+
+
+
+
+
+<!-- Form -->
+  <div class="col-md-3">
     <div class="input-group">
-      <input type="text" class="form-controll" placeholder="Stock Symbol" aria-describedby="stock symbol">
+      <input type="text" class="form-control" placeholder="Stock Symbol" ng-model="addstock" aria-describedby="stock symbol">
       <span class="input-group-btn">
-        <button type="button" class="btn btn-default">Add Symbol</button>
+        <button type="button" class="btn btn-default" ng-click="addSymbol(addstock)">Add Symbol</button>
       </span>
     </div>
-  </div>
+  </div><!--col-md-6-->
+
+<div class="col-md-12">
+  <li ng-repeat="symbol in symbols" class="list-group-item">
+    <button type="button" class="close" aria-label="close" ng-click="removeSymbol(symbol)" aria-hidden="true"></button>
+    <p class="text-center">{{symbol}}</p>
+  </li>
 </div>

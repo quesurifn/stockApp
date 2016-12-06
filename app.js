@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var socketio = require('socket.io');
+var io = require('socket.io')(app);
 var mongoose = require('mongoose');
 var yahooFinance = require('yahoo-finance');
 require('./models/model.js');
@@ -61,7 +61,88 @@ app.use(function(err, req, res, next) {
 });
 
 
+//Date parsing for Yahoo Finance API
+
+var now = new Date();
+
+var convertDate = function(date) {
+  // year - month - day
+  return date.getFullYear() + "-" + getFullMonth()+1 + "-" + date.getDate();
+};
+
+var lastYear = function(date) {
+  return date.getFullYear()-1 + "-" + getFullMonth()+1 + "-" + date.getDate();
+};
+
+var twoYearsAgo = function(date) {
+  return date.getFullYear()-2 + "-" + getFullMonth()+1 + "-" + date.getDate();
+};
+
+//Routing For Stock Symbols
+
+app.post('/addquotes/:query' function(req, res) {
+  //Called from angular form
+
+  req.params.query = req.params.query.toUpperCase();
+
+  yahooFinance.historical({
+      symbol: req.params.query,
+      from: lastYear,
+      to: convertDate(now);
 
 
+    }, function(err, quotes) {
+      if (err) {
+        handleError(res, err.message, "Failed to find stocks from Yahoo Finance");
+
+      } else {
+        //API Call Successful
+
+        var dataSeries = [];
+
+        for (var i = 0; i < quotes.length; i++) {
+          var date = Date.parse(quotes[i].date);
+
+          var object = [date, quotes[i].close]
+
+          dataSeries.push(object);
+        } //loop
+
+        var chartData = {
+
+          name: req.params.query,
+          data: dataSeries,
+          tooltip: {
+            valueDecimals:2
+          }
+        };
+
+        var dbSend = {
+          "symbol": req.params.query
+        };
+
+        db.collection(Stocks).insertOne(sendDB, function(err, doc){
+
+          if (err) {
+            handleError(res, err.message, "Failed to send stock to db")
+          } else {
+            sendDb = {};
+          } // ifelse
+
+        })//DB Collection
+      }//else
+    } //function err quotes
+  }); //yahoo Finance
+); //app post
+
+app.get("/removequotes/:query", function(req, res) {
+  db.collection(Stocks).deleteOne({"symbol": req.params.query}, function(err, doc){
+    if (err){
+      handleError(res, err.message, "Failed to remove stock from db");
+    } else {
+      console.log("Stock Deleted");
+    }
+  });
+});
 
 module.exports = app;

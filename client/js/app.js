@@ -12,6 +12,16 @@ $routeProvider
   })
 }]);
 
+app.service("Stcoks", function($http) {
+  var url = "quotes/";
+
+  this.addQuote = function() {
+    return $http.get(url);
+  };
+
+  this.remo
+
+})
 
 app.controller('chartController', function ($scope, $timeout) {
     $scope.chartConfig = {
